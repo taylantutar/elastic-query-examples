@@ -1,12 +1,23 @@
+using Es.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Es.Controllers;
 
-public class TTrCom : Controller
+public class TTrCom : ControllerBase
 {
-    // GET
-    public IActionResult Index()
+    private readonly TTrComRepository _repository;
+
+    public TTrCom(TTrComRepository repository)
     {
-        return View();
+        _repository = repository;
+    }
+
+
+    // GET
+    [HttpPost]
+    [Route("GetByCustomerFullName")]
+    public async Task<IActionResult> GetByCustomerFullName(string customerFullName)
+    {
+        return Ok(await _repository.GetByCustomerFullName(customerFullName));
     }
 }
