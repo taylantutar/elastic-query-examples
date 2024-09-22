@@ -13,11 +13,23 @@ public class TTrCom : ControllerBase
     }
 
 
-    // GET
     [HttpPost]
     [Route("GetByCustomerFullName")]
     public async Task<IActionResult> GetByCustomerFullName(string customerFullName)
     {
         return Ok(await _repository.GetByCustomerFullName(customerFullName));
+    }
+
+    [HttpPost]
+    [Route("GetByCustomerIdList")]
+    public async Task<IActionResult> GetByCustomerIdList(List<int> customerIdlist)
+    {
+        return Ok(await _repository.GetByCustomerIdList(customerIdlist));
+    }
+    [HttpPost]
+    [Route("GetByIdList")]
+    public async Task<IActionResult> GetByIdList(List<string> idlist)
+    {
+        return Ok(await _repository.GetByIdList(idlist));
     }
 }

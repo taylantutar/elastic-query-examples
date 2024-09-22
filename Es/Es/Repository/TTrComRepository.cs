@@ -17,8 +17,49 @@ public class TTrComRepository
     {
         var termQuery = new TermQuery("customer_full_name.keyword") { Value = customerFullName, CaseInsensitive = true };
         var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName).Query(termQuery));
+
+        foreach (var hit in result.Hits) 
+            hit.Source.Id = hit.Id;
+
+        return result.Documents.ToList();
+    }
+
+    public async Task<List<TTrComModel>> GetByCustomerIdList(List<int> customerIdlist)
+    {
+        List<FieldValue> terms = new List<FieldValue>();
+        customerIdlist.ForEach(x =>
+        {
+            terms.Add(x);
+        });
+
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                                                                        .Query(q => q
+                                                                        .Terms(t => t
+                                                                        .Field(f => f.CustomerId)
+                                                                        .Term(new TermsQueryField(terms.AsReadOnly())))));
+
+
         foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
-        
+
+        return result.Documents.ToList();
+    }
+    public async Task<List<TTrComModel>> GetByIdList(List<string> idlist)
+    {
+        List<FieldValue> terms = new List<FieldValue>();
+        idlist.ForEach(x =>
+        {
+            terms.Add(x);
+        });
+
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                                                                        .Query(q => q
+                                                                        .Terms(t => t
+                                                                        .Field(f => f.Id)
+                                                                        .Term(new TermsQueryField(terms.AsReadOnly())))));
+
+
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+
         return result.Documents.ToList();
     }
 }
