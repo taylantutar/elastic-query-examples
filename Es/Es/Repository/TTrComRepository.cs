@@ -18,7 +18,7 @@ public class TTrComRepository
         var termQuery = new TermQuery("customer_full_name.keyword") { Value = customerFullName, CaseInsensitive = true };
         var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName).Query(termQuery));
 
-        foreach (var hit in result.Hits) 
+        foreach (var hit in result.Hits)
             hit.Source.Id = hit.Id;
 
         return result.Documents.ToList();
@@ -61,5 +61,20 @@ public class TTrComRepository
         foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
 
         return result.Documents.ToList();
+    }
+
+    public async Task<List<TTrComModel>> GetStartWithCustomerName(string prefix)
+    {
+
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                                                                        .Query(q => q
+                                                                        .Prefix(p => p
+                                                                        .Field(f => f.CustomerFullName.Suffix("keyword"))
+                                                                        .Value(prefix))));
+
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+
+        return result.Documents.ToList();
+
     }
 }

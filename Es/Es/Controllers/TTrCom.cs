@@ -32,4 +32,13 @@ public class TTrCom : ControllerBase
     {
         return Ok(await _repository.GetByIdList(idlist));
     }
+
+    [HttpPost]
+    [Route("GetStartWithCustomerName")]
+    public async Task<IActionResult> GetStartWithCustomerName(string prefix)
+    {
+        return Ok(await _repository.GetStartWithCustomerName(prefix));
+    }
+
+    
 }
