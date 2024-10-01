@@ -40,5 +40,11 @@ public class TTrCom : ControllerBase
         return Ok(await _repository.GetStartWithCustomerName(prefix));
     }
 
-    
+    [HttpPost]
+    [Route("GetTaxfulTotalPriceByRange")]
+    public async Task<IActionResult> GetTaxfulTotalPriceByRange(double from, double to)
+    {
+        return Ok(await _repository.GetTaxfulTotalPriceByRange(from, to));
+    }
+
 }

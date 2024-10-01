@@ -65,7 +65,6 @@ public class TTrComRepository
 
     public async Task<List<TTrComModel>> GetStartWithCustomerName(string prefix)
     {
-
         var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
                                                                         .Query(q => q
                                                                         .Prefix(p => p
@@ -75,6 +74,19 @@ public class TTrComRepository
         foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
 
         return result.Documents.ToList();
+    }
 
+    public async Task<List<TTrComModel>> GetTaxfulTotalPriceByRange(double from, double to)
+    {
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                                                                        .Query(q => q
+                                                                        .Range(p => p
+                                                                        .NumberRange(nr => nr
+                                                                        .Field(f => f.TaxfulTotalPrice)
+                                                                        .Gt(from).Lt(to)))));
+
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+
+        return result.Documents.ToList();
     }
 }
