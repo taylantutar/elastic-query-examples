@@ -12,6 +12,17 @@ public class TTrCom : ControllerBase
         _repository = repository;
     }
 
+    [HttpPost]
+    [Route("GetAll")]
+    public async Task<IActionResult> GetAll(int from, int size)
+    {
+        var data = await _repository.GetAll(from, size);
+        return Ok(new
+        {
+            Data = data,
+            Size = data.Count
+        });
+    }
 
     [HttpPost]
     [Route("GetByCustomerFullName")]

@@ -13,6 +13,18 @@ public class TTrComRepository
         this._elasticsearchClient = elasticsearchClient;
     }
 
+
+    public async Task<List<TTrComModel>> GetAll(int from, int size)
+    {
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                                                                        .Size(size).From(from)
+                                                                        .Query(q => q.MatchAll((r) => {})));
+
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+
+        return result.Documents.ToList();
+    }
+
     public async Task<List<TTrComModel>> GetByCustomerFullName(string customerFullName)
     {
         var termQuery = new TermQuery("customer_full_name.keyword") { Value = customerFullName, CaseInsensitive = true };
