@@ -58,4 +58,11 @@ public class TTrCom : ControllerBase
         return Ok(await _repository.GetTaxfulTotalPriceByRange(from, to));
     }
 
+    [HttpPost]
+    [Route("GetByWildcard")]
+    public async Task<IActionResult> GetByWildcard(string wildcard)
+    {
+        return Ok(await _repository.GetByWildcard(wildcard));
+    }
+
 }

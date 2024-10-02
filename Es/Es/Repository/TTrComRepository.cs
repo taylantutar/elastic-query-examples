@@ -101,4 +101,17 @@ public class TTrComRepository
 
         return result.Documents.ToList();
     }
+
+    public async Task<List<TTrComModel>> GetByWildcard(string customerName) // like *,? --> Ma*, Mar? (Mary)
+    {
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                                                                        .Query(q => 
+                                                                        q.Wildcard(w => 
+                                                                        w.Field(f => f.CustomerFirstName.Suffix("keyword"))
+                                                                        .Wildcard(customerName))));
+
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+
+        return result.Documents.ToList();
+    }
 }
