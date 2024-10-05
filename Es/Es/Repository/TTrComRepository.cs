@@ -117,29 +117,37 @@ public class TTrComRepository
 
     public async Task<List<TTrComModel>> FullTextSearchAsync(string name)
     {
-                var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
-                .Query(q => q
-                .Match(m => m
-                    .Field(f => f.CustomerFullName)
-                    .Query(name).Operator(Operator.And))));
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+        .Query(q => q
+        .Match(m => m
+            .Field(f => f.CustomerFullName)
+            .Query(name).Operator(Operator.And))));
 
         foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
         return result.Documents.ToList();
     }
     public async Task<List<TTrComModel>> FullTextSearchWithPrefixAsync(string name)
-		{
+    {
 
 
-			var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
-				.Size(10).Query(q => q
-					.MultiMatch(mm =>
-						mm.Fields(new Field("customer_first_name")
-							.And(new Field("customer_last_name"))
-							.And(new Field("customer_full_name")))
-							.Query(name))));
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+            .Size(50).Query(q => q
+                .MatchBoolPrefix(m => m
+                    .Field(f => f.CustomerFullName)
+                    .Query(name))));
 
-			foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
-			return result.Documents.ToList();
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+        return result.Documents.ToList();
+    }
+    public async Task<List<TTrComModel>> FullTextSearchWithPhraseAsync(string name)
+    {
+        var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+            .Size(1000).Query(q => q
+                .MatchPhrase(m => m
+                    .Field(f => f.CustomerFullName)
+                    .Query(name))));
 
-		}
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+        return result.Documents.ToList();
+    }
 }

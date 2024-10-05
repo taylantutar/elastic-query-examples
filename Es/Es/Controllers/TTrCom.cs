@@ -77,5 +77,11 @@ public class TTrCom : ControllerBase
     {
         return Ok(await _repository.FullTextSearchWithPrefixAsync(name));
     }
+    [HttpGet]
+    [Route("FullTextSearchWithPhraseAsync")] // Mary Bail --> Mary Bailey
+    public async Task<IActionResult> FullTextSearchWithPhraseAsync(string name)
+    {
+        return Ok(await _repository.FullTextSearchWithPhraseAsync(name));
+    }
 
 }
