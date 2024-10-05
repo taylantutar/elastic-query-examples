@@ -18,7 +18,7 @@ public class TTrComRepository
     {
         var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
                                                                         .Size(size).From(from)
-                                                                        .Query(q => q.MatchAll((r) => {})));
+                                                                        .Query(q => q.MatchAll((r) => { })));
 
         foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
 
@@ -105,13 +105,25 @@ public class TTrComRepository
     public async Task<List<TTrComModel>> GetByWildcard(string customerName) // like *,? --> Ma*, Mar? (Mary)
     {
         var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
-                                                                        .Query(q => 
-                                                                        q.Wildcard(w => 
+                                                                        .Query(q =>
+                                                                        q.Wildcard(w =>
                                                                         w.Field(f => f.CustomerFirstName.Suffix("keyword"))
                                                                         .Wildcard(customerName))));
 
         foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
 
+        return result.Documents.ToList();
+    }
+
+    public async Task<List<TTrComModel>> FullTextSearchAsync(string name)
+    {
+                var result = await _elasticsearchClient.SearchAsync<TTrComModel>(s => s.Index(indexName)
+                .Query(q => q
+                .Match(m => m
+                    .Field(f => f.CustomerFullName)
+                    .Query(name).Operator(Operator.And))));
+
+        foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
         return result.Documents.ToList();
     }
 }
